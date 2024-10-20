@@ -7,14 +7,19 @@ public class MyHashTable <K,V> implements Iterable<Node<K,V>> {
     Node<K,V>[] buckets;
     int Cursize ;
     int MaxSize;
+    int LastMaxSize;
 
     public MyHashTable(int capacity) {
         buckets = new Node[capacity];
         MaxSize = capacity;
+        LastMaxSize = capacity;
         Cursize = 0;
     }
 
     V put(K key, V value){
+        if(Cursize/MaxSize >= 0.7){
+            Recize();
+        }
         int index = HashCode(key);
         Node<K,V> newNode = new Node<>(key,value);
         if(buckets[index] == null){
@@ -172,5 +177,30 @@ public class MyHashTable <K,V> implements Iterable<Node<K,V>> {
     }
 
 
+    void Recize(){
+        LastMaxSize = MaxSize;
+        if(MaxSize <=50){
+            MaxSize *=2;
+        }
+        else if(MaxSize <= 150){
+            MaxSize = MaxSize + (int)(MaxSize*0.3);
+        }
+        else{
+            MaxSize = MaxSize + (int)(MaxSize*0.1);
+        }
+        Node<K,V>[] newBuckets = new Node[MaxSize];
+
+        for (var bucket : buckets) {
+            while (bucket != null) {
+                int newIndex = HashCode(bucket.key);
+                Node<K,V> nextbucket = bucket.next;
+                bucket.next = newBuckets[newIndex];
+                newBuckets[newIndex] = bucket;
+                bucket = nextbucket;
+            }
+        }
+        buckets = newBuckets;
+
+    }
 
 }
