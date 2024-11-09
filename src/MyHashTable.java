@@ -119,20 +119,20 @@ public class MyHashTable <K,V> implements Iterable<Node<K,V>> {
         private int currentBucket = 0;
         private Node<K, V> currentNode = null;
 
+        public HashTableIterator() {
+            advanceToNextNode();
+        }
+
+        private void advanceToNextNode() {
+            // Прокручиваем до следующего бакета, если текущий узел равен null
+            while (currentBucket < buckets.length && currentNode == null) {
+                currentNode = buckets[currentBucket++];
+            }
+        }
+
         @Override
         public boolean hasNext() {
-            if (currentNode != null && currentNode.next != null) {
-                return true; // Есть следующий узел в текущем списке
-            }
-
-            while (currentBucket < buckets.length) {
-                currentNode = buckets[currentBucket++];
-                if (currentNode != null) {
-                    return true; // Найден первый узел в следующем бакете
-                }
-            }
-
-            return false; // больше нет узлов
+            return currentNode != null; // Если текущий узел не равен null, значит есть следующий узел
         }
 
         @Override
@@ -141,13 +141,10 @@ public class MyHashTable <K,V> implements Iterable<Node<K,V>> {
                 throw new NoSuchElementException("No more elements in the hash table");
             }
 
-            if (currentNode != null) {
-                Node<K, V> returnNode = currentNode;
-                currentNode = currentNode.next;
-                return returnNode; //  текущий узел
-            }
-
-            throw new IllegalStateException("Iterator is in an invalid state.");
+            Node<K, V> returnNode = currentNode; // сохраняем текущий узел
+            currentNode = currentNode.next; // переходим к следующему узлу в том же бакете
+            advanceToNextNode(); // контролируем переход к следующему бакету, если необходимо
+            return returnNode; // возвращаем текущий узел
         }
     }
 

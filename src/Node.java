@@ -8,7 +8,4 @@ public class Node <K,V>{
         this.value = value;
         next = null;
     }
-
-
-
 }
